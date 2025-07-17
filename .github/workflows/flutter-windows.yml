@@ -1,0 +1,198 @@
+name: Flutter Windows Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+        - release
+        - debug
+
+env:
+  FLUTTER_VERSION: 3.245
+  FLUTTER_CHANNEL: stable"
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+
+      - name: Enable Windows desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            .dart_tool/
+            .pub-cache/
+            build/
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
+
+  test:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+
+      - name: Enable Windows desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            .dart_tool/
+            .pub-cache/
+            build/
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Analyze code
+        run: flutter analyze
+
+      - name: Check formatting
+        run: flutter format --set-exit-if-changed .
+
+  build-windows:
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+
+      - name: Enable Windows desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            .dart_tool/
+            .pub-cache/
+            build/
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
+
+      - name: Build Windows Release
+        if: github.event.inputs.build_type != 'debug'
+        run: flutter build windows --release
+
+      - name: Build Windows Debug
+        if: github.event.inputs.build_type == 'debug'
+        run: flutter build windows --debug
+
+      - name: Upload Release Artifacts
+        if: github.event.inputs.build_type != 'debug'
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-release
+          path: build/windows/runner/Release/
+          retention-days: 7
+
+      - name: Upload Debug Artifacts
+        if: github.event.inputs.build_type == 'debug'
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-debug
+          path: build/windows/runner/Debug/
+          retention-days: 1
+
+  create-installer:
+    needs: build-windows
+    runs-on: windows-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+
+      - name: Enable Windows desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            .dart_tool/
+            .pub-cache/
+            build/
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
+
+      - name: Build Windows Release
+        run: flutter build windows --release
+
+      - name: Download Release Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: windows-release
+          path: build/windows/runner/Release/
+
+      - name: Create Installer
+        run: |
+          echo "Creating Windows installer..."
+          # Add installer creation logic here
+          # Example: using NSIS, Inno Setup, or other installer tools
+          echo "Installer creation completed"
+
+      - name: Upload Installer
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-installer
+          path: build/windows/installer/
+          retention-days: 30 
