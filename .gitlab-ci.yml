@@ -1,0 +1,129 @@
+# GitLab CI/CD Pipeline for Flutter Windows Build
+# This pipeline builds the Flutter app for Windows platform
+
+stages:
+  - setup
+  - test
+  - build
+  - artifacts
+
+variables:
+  FLUTTER_VERSION: 3.245
+  FLUTTER_CHANNEL: stable"
+  FLUTTER_HOME: $CI_PROJECT_DIR/.flutter  PATH: $FLUTTER_HOME/bin:$PATH"
+
+# Cache Flutter dependencies and build artifacts
+cache:
+  key: $CI_COMMIT_REF_SLUG
+  paths:
+    - .flutter/
+    - .pub-cache/
+    - build/
+    - .dart_tool/
+
+# Setup Flutter environment
+setup_flutter:
+  stage: setup
+  image: ubuntu:220.4
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq curl git unzip xz-utils zip libglu1-mesa
+    - git clone https://github.com/flutter/flutter.git -b $FLUTTER_CHANNEL $FLUTTER_HOME
+    - flutter doctor
+    - flutter config --enable-windows-desktop
+    - flutter pub get
+  script:
+    - echo "Flutter environment setup completed"
+  artifacts:
+    paths:
+      - .flutter/
+      - .pub-cache/
+    expire_in: 1 hour
+
+# Run Flutter tests
+test:
+  stage: test
+  image: ubuntu:224 dependencies:
+    - setup_flutter
+  before_script:
+    - export PATH=$FLUTTER_HOME/bin:$PATH
+    - flutter doctor
+  script:
+    - flutter test
+  coverage: /All tests passed!/
+
+# Build Flutter Windows app
+build_windows:
+  stage: build
+  image: ubuntu:224 dependencies:
+    - setup_flutter
+  before_script:
+    - export PATH=$FLUTTER_HOME/bin:$PATH
+    - flutter doctor
+    - flutter pub get
+  script:
+    - flutter build windows --release
+    - echo "Windows build completed successfully"
+  artifacts:
+    paths:
+      - build/windows/runner/Release/
+    expire_in: 1week
+    reports:
+      junit: build/test-results/test.xml
+  only:
+    - main
+    - develop
+    - merge_requests
+
+# Create Windows installer (optional - requires additional tools)
+create_installer:
+  stage: artifacts
+  image: ubuntu:224 dependencies:
+    - build_windows
+  before_script:
+    - export PATH=$FLUTTER_HOME/bin:$PATH
+    - apt-get update -qq && apt-get install -y -qq wine64 wine32script:
+    - echoCreating Windows installer..."
+    # Add installer creation logic here if needed
+    # Example: using NSIS or other installer tools
+    - echo "Installer creation completed"
+  artifacts:
+    paths:
+      - build/windows/installer/
+    expire_in: 1 month
+  only:
+    - tags
+  when: manual
+
+# Build for development (debug mode)
+build_windows_debug:
+  stage: build
+  image: ubuntu:224 dependencies:
+    - setup_flutter
+  before_script:
+    - export PATH=$FLUTTER_HOME/bin:$PATH
+    - flutter doctor
+    - flutter pub get
+  script:
+    - flutter build windows --debug
+    - echo "Windows debug build completed successfully"
+  artifacts:
+    paths:
+      - build/windows/runner/Debug/
+    expire_in: 1 day
+  only:
+    - merge_requests
+  when: manual
+
+# Code quality checks
+lint:
+  stage: test
+  image: ubuntu:224 dependencies:
+    - setup_flutter
+  before_script:
+    - export PATH=$FLUTTER_HOME/bin:$PATH
+    - flutter doctor
+  script:
+    - flutter analyze
+    - flutter format --set-exit-if-changed .
+  only:
+    - merge_requests 
