@@ -26,7 +26,7 @@ You can manually trigger the workflow with custom parameters:
 ## Jobs Details
 
 ### Setup Job
-- **Runner**: Ubuntu Latest
+- **Runner**: Windows Latest
 - **Purpose**: Initial Flutter setup and dependency caching
 - **Actions**:
   - Checkout code
@@ -36,7 +36,7 @@ You can manually trigger the workflow with custom parameters:
   - Cache Flutter dependencies
 
 ### Test Job
-- **Runner**: Ubuntu Latest
+- **Runner**: Windows Latest
 - **Dependencies**: Requires setup job completion
 - **Actions**:
   - Run Flutter unit tests
@@ -116,8 +116,7 @@ Cache key is based on:
 ## Requirements
 
 ### GitHub Runner Requirements
-- **Ubuntu Latest**: For setup and testing
-- **Windows Latest**: For Windows builds
+- **Windows Latest**: For all jobs (setup, testing, and builds)
 - **Memory**: At least 4GB RAM recommended
 - **Disk Space**: At least 10GB free space
 
