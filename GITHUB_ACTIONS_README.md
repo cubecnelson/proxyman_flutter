@@ -68,8 +68,7 @@ You can manually trigger the workflow with custom parameters:
 ### Environment Variables
 ```yaml
 env:
-  FLUTTER_VERSION: 3.245
-  FLUTTER_CHANNEL: stable"
+  FLUTTER_VERSION: 3.22.0
 ```
 
 ### Caching Strategy
@@ -123,7 +122,7 @@ Cache key is based on:
 - **Disk Space**: At least 10GB free space
 
 ### Flutter Requirements
-- Flutter SDK 3.245 or later
+- Flutter SDK 3.22.0 or later
 - Windows desktop support enabled
 - All dependencies in `pubspec.yaml`
 
