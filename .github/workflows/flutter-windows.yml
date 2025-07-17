@@ -17,8 +17,7 @@ on:
         - debug
 
 env:
-  FLUTTER_VERSION: 3.245
-  FLUTTER_CHANNEL: stable"
+  FLUTTER_VERSION: 3.22.0
 
 jobs:
   setup:
@@ -31,7 +30,6 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: ${{ env.FLUTTER_CHANNEL }}
 
       - name: Enable Windows desktop
         run: flutter config --enable-windows-desktop
@@ -187,7 +185,7 @@ jobs:
         run: |
           echo "Creating Windows installer..."
           # Add installer creation logic here
-          # Example: using NSIS, Inno Setup, or other installer tools
+        # Example: using NSIS, Inno Setup, or other installer tools
           echo "Installer creation completed"
 
       - name: Upload Installer
