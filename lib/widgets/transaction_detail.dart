@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import '../models/http_transaction.dart';
+import 'request_editor.dart';
+import 'response_editor.dart';
 
 class TransactionDetail extends StatelessWidget {
   final HttpTransaction? transaction;
+  final Function(HttpTransaction)? onTransactionUpdated;
 
   const TransactionDetail({
     super.key,
     this.transaction,
+    this.onTransactionUpdated,
   });
 
   @override
@@ -96,6 +100,19 @@ class TransactionDetail extends StatelessWidget {
                   ),
                 ),
               ),
+              if (onTransactionUpdated != null) ...[
+                IconButton(
+                  icon: const Icon(Icons.edit, size: 20),
+                  onPressed: () => _editRequest(context),
+                  tooltip: 'Edit Request',
+                ),
+                if (response != null)
+                  IconButton(
+                    icon: const Icon(Icons.edit_note, size: 20),
+                    onPressed: () => _editResponse(context),
+                    tooltip: 'Edit Response',
+                  ),
+              ],
             ],
           ),
           const SizedBox(height: 8),
@@ -496,6 +513,44 @@ class TransactionDetail extends StatelessWidget {
       default:
         return Colors.grey;
     }
+  }
+
+  void _editRequest(BuildContext context) {
+    if (transaction == null || onTransactionUpdated == null) return;
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => RequestEditor(
+          request: transaction!.request,
+          onSave: (updatedRequest) {
+            final updatedTransaction = transaction!.copyWith(
+              request: updatedRequest,
+            );
+            onTransactionUpdated!(updatedTransaction);
+          },
+          onCancel: () {},
+        ),
+      ),
+    );
+  }
+
+  void _editResponse(BuildContext context) {
+    if (transaction?.response == null || onTransactionUpdated == null) return;
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ResponseEditor(
+          response: transaction!.response!,
+          onSave: (updatedResponse) {
+            final updatedTransaction = transaction!.copyWith(
+              response: updatedResponse,
+            );
+            onTransactionUpdated!(updatedTransaction);
+          },
+          onCancel: () {},
+        ),
+      ),
+    );
   }
 
   Color _getStatusColor(int statusCode) {

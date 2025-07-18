@@ -395,6 +395,24 @@ class _MainScreenState extends State<MainScreen> {
                 Expanded(
                   child: TransactionDetail(
                     transaction: selectedTransaction,
+                    onTransactionUpdated: (updatedTransaction) {
+                      setState(() {
+                        // Update the transaction in the list
+                        final index = transactions.indexWhere(
+                          (t) => t.id == updatedTransaction.id,
+                        );
+                        if (index != -1) {
+                          transactions[index] = updatedTransaction;
+                          // Update selected transaction if it's the same one
+                          if (selectedTransaction?.id ==
+                              updatedTransaction.id) {
+                            selectedTransaction = updatedTransaction;
+                          }
+                          // Re-apply filters
+                          _filterTransactions();
+                        }
+                      });
+                    },
                   ),
                 ),
               ],

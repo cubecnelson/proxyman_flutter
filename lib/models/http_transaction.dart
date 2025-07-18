@@ -1,7 +1,7 @@
 class HttpTransaction {
   final String id;
-  final HttpRequestData request;
-  final HttpResponseData? response;
+  HttpRequestData request;
+  HttpResponseData? response;
   final DateTime startTime;
   final Duration? duration;
 
@@ -12,13 +12,29 @@ class HttpTransaction {
     required this.startTime,
     this.duration,
   });
+
+  HttpTransaction copyWith({
+    String? id,
+    HttpRequestData? request,
+    HttpResponseData? response,
+    DateTime? startTime,
+    Duration? duration,
+  }) {
+    return HttpTransaction(
+      id: id ?? this.id,
+      request: request ?? this.request,
+      response: response ?? this.response,
+      startTime: startTime ?? this.startTime,
+      duration: duration ?? this.duration,
+    );
+  }
 }
 
 class HttpRequestData {
-  final String method;
-  final String url;
-  final String? body;
-  final Map<String, String> headers;
+  String method;
+  String url;
+  String? body;
+  Map<String, String> headers;
 
   HttpRequestData({
     required this.method,
@@ -26,12 +42,26 @@ class HttpRequestData {
     this.body,
     this.headers = const {},
   });
+
+  HttpRequestData copyWith({
+    String? method,
+    String? url,
+    String? body,
+    Map<String, String>? headers,
+  }) {
+    return HttpRequestData(
+      method: method ?? this.method,
+      url: url ?? this.url,
+      body: body ?? this.body,
+      headers: headers ?? Map.from(this.headers),
+    );
+  }
 }
 
 class HttpResponseData {
-  final int statusCode;
-  final String? body;
-  final Map<String, String> headers;
+  int statusCode;
+  String? body;
+  Map<String, String> headers;
   final DateTime timestamp;
 
   HttpResponseData({
@@ -40,4 +70,18 @@ class HttpResponseData {
     this.headers = const {},
     required this.timestamp,
   });
+
+  HttpResponseData copyWith({
+    int? statusCode,
+    String? body,
+    Map<String, String>? headers,
+    DateTime? timestamp,
+  }) {
+    return HttpResponseData(
+      statusCode: statusCode ?? this.statusCode,
+      body: body ?? this.body,
+      headers: headers ?? Map.from(this.headers),
+      timestamp: timestamp ?? this.timestamp,
+    );
+  }
 }

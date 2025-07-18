@@ -23,6 +23,12 @@ A Proxyman-like network debugging proxy tool built with Flutter. This applicatio
 - **Clear Transactions**: Reset captured traffic
 - **Real-time Status**: Visual indicator of proxy server status
 
+### ✏️ Modification Features
+- **Request Editing**: Edit HTTP method, URL, headers, and body
+- **Response Editing**: Modify status codes, response headers, and body
+- **Real-time Updates**: Changes are immediately reflected in the UI
+- **Header Management**: Add, edit, or remove request and response headers
+
 ## Screenshots
 
 The application features a split-pane interface:
@@ -78,6 +84,12 @@ The application features a split-pane interface:
    - **Stop**: Pause traffic capture
    - **Clear**: Remove all captured transactions
    - **Start**: Resume traffic capture
+
+5. **Modify Transactions**
+   - **Edit Request**: Click the edit icon (✏️) in the transaction header to modify request details
+   - **Edit Response**: Click the edit note icon (📝) to modify response details
+   - **Update Headers**: Add, edit, or remove headers in the modification interface
+   - **Save Changes**: Click "Save" to apply modifications to the transaction
 
 ## Architecture
 
@@ -135,10 +147,10 @@ This is a **simulated proxy** that generates mock HTTP transactions to demonstra
 ### Planned Features
 - [ ] **Real HTTP Proxy**: Actual network traffic interception
 - [ ] **SSL/TLS Support**: HTTPS traffic inspection
-- [ ] **Request Modification**: Edit requests before sending
-- [ ] **Response Modification**: Modify responses
-- [ ] **Filtering**: Filter transactions by method, status, domain
-- [ ] **Search**: Search through transaction data
+- [x] **Request Modification**: Edit requests before sending
+- [x] **Response Modification**: Modify responses
+- [x] **Filtering**: Filter transactions by method, status, domain
+- [x] **Search**: Search through transaction data
 - [ ] **Export**: Export transactions to various formats
 - [ ] **Breakpoints**: Set breakpoints for specific requests
 - [ ] **Mobile Support**: Run on mobile devices
