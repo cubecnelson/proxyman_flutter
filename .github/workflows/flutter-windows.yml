@@ -182,7 +182,7 @@ jobs:
         run: |
           echo "Creating Windows installer..."
           # Add installer creation logic here
-        # Example: using NSIS, Inno Setup, or other installer tools
+          # Example: using NSIS, Inno Setup, or other installer tools
           echo "Installer creation completed"
 
       - name: Upload Installer
